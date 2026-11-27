@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>譜面類型指標企劃</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* VOICE  document to read: a proposal, calm and exact, every fact kept
+   IDEA   the maimai cabinet's round screen and the five-axis radar the proposal wants to print on every chart
+   PICTURE a five-axis radar (sample shape against the level-average ring) beside the title
+   COLOUR white ground, ink, tap pink as the lead, slide blue as support; night is the same on a deep plum-black
+   TYPE   Noto Sans TC 900 for titles, Noto Sans TC for text
+   LAYOUT laptop: title band with radar at right, then sticky chapter list left of the text; phone: title, radar, chapter row, text */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#141218);--ink:light-dark(#1b1a20,#ecebf0);--soft:light-dark(#5b5866,#a9a6b4);--line:light-dark(#e3e1e8,#2e2b36);--panel:light-dark(#f7f5f9,#1c1a22);--pink:light-dark(#d81b60,#ff5c93);--pinkwash:light-dark(#fde7ef,#3a1826);--blue:light-dark(#1f5fd1,#6ea2ff);--mark:light-dark(#fff1a8,#4a4220)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:24px;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16.5px/1.8 "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;overflow-x:clip}
+a{color:var(--blue)}
+img,svg{max-width:100%}
+.band{padding-block:clamp(28px,4vw,56px);padding-left:max(5vw,16px,env(safe-area-inset-left,0px));padding-right:max(5vw,16px,env(safe-area-inset-right,0px))}
+.top{background:var(--pinkwash);border-bottom:1px solid var(--line)}
+.top-in{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center}
+h1{font-weight:900;font-size:clamp(32px,5vw,50px);line-height:1.12;letter-spacing:-.01em;margin:0 0 14px;text-wrap:balance}
+.meta{color:var(--soft);font-size:15px;margin:0 0 20px}
+.lead{font-size:clamp(17px,1.6vw,19px);line-height:1.75;margin:0 0 22px;max-width:36em}
+.axes{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.axes li{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:15px}
+.axes b{color:var(--pink)}
+.radar{display:grid;justify-items:center}
+.radar svg{width:100%;max-width:440px;height:auto}
+.radar p{margin:4px 0 0;font-size:13px;color:var(--soft);text-align:center}
+svg text{font-family:inherit}
+.r-grid{fill:none;stroke:var(--line);stroke-width:1}
+.r-avg{fill:none;stroke:var(--blue);stroke-width:1.5;stroke-dasharray:5 4}
+.r-shape{fill:var(--pink);fill-opacity:.18;stroke:var(--pink);stroke-width:2.5;stroke-linejoin:round}
+.r-dot{fill:var(--pink)}
+.r-lab{fill:var(--ink);font-size:16px;font-weight:700}
+.r-note{fill:var(--blue);font-size:12px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:start}
+nav.toc{position:sticky;top:24px;font-size:14.5px;line-height:1.5;border-left:2px solid var(--line);padding-left:14px}
+nav.toc a{display:block;color:var(--soft);text-decoration:none;padding:5px 0}
+nav.toc a.sub{padding-left:14px;font-size:13.5px}
+nav.toc a:hover{color:var(--ink)}
+nav.toc a.on{color:var(--pink);font-weight:700}
+article{max-width:44em}
+h2{font-weight:900;font-size:clamp(24px,2.6vw,30px);line-height:1.3;margin:56px 0 14px;padding-top:18px;border-top:2px solid var(--ink)}
+article>section:first-child h2{margin-top:0}
+h3{font-size:20px;line-height:1.4;margin:36px 0 10px}
+h4{font-size:17px;margin:26px 0 8px;color:var(--pink)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:1.5em}
+li{margin:0 0 6px}
+.def{font-weight:700;font-size:17.5px;border-left:4px solid var(--pink);padding:4px 0 4px 14px;margin:0 0 16px}
+.plan{background:var(--mark);padding:12px 16px;border-radius:6px;font-weight:700}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15.5px;margin:4px 0 6px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{border-bottom:2px solid var(--ink);font-weight:700}
+.nw{white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.total td{font-weight:700;border-bottom:2px solid var(--ink)}
+.cap{font-size:14px;color:var(--soft);margin:6px 0 26px}
+figure{margin:8px 0 6px}
+.fig-box{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:14px}
+.fig-box svg{display:block;width:100%;height:auto}
+.wide svg{min-width:600px}
+.flow svg{min-width:470px;max-width:620px;margin:0 auto}
+.f-ink{fill:var(--ink)}
+.f-soft{fill:var(--soft)}
+.f-line{stroke:var(--soft);fill:none;stroke-width:1.3}
+.f-box{fill:var(--bg);stroke:var(--soft);stroke-width:1.3}
+.f-main{fill:var(--pinkwash);stroke:var(--pink);stroke-width:2}
+.f-arrow{fill:var(--soft)}
+.f-note{fill:var(--ink)}
+.burst{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.burst svg{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.b-area{fill:var(--soft);fill-opacity:.15}
+.b-line{fill:none;stroke:var(--soft);stroke-width:2.2;stroke-linejoin:round}
+.b-avg{stroke:var(--pink);stroke-width:3}
+.b-avgwash{fill:var(--pink);fill-opacity:.08}
+.b-peak{stroke:var(--soft);stroke-dasharray:4 4}
+.b-axis{stroke:var(--line)}
+.b-t{fill:var(--soft);font-size:12px}
+.b-k{fill:var(--ink);font-size:13px;font-weight:700}
+.refs li{margin-bottom:10px}
+footer{border-top:1px solid var(--line);color:var(--soft);font-size:14px}
+footer p{max-width:1240px;margin:0 auto}
+@media(max-width:899px){.wrap{grid-template-columns:minmax(0,1fr)}nav.toc{position:static;border-left:0;padding:0;display:flex;gap:6px 14px;overflow-x:auto;white-space:nowrap;border-bottom:1px solid var(--line);padding-bottom:10px}nav.toc a{flex:none}nav.toc a.sub{display:none}}
+@media(max-width:700px){.top-in{grid-template-columns:minmax(0,1fr)}.radar svg{max-width:360px}}
+@media(max-width:600px){table{font-size:14px}th,td{padding:7px 6px}.burst{grid-template-columns:minmax(0,1fr)}table.stack thead{display:none}table.stack,table.stack tbody,table.stack tr,table.stack td{display:block;width:100%}table.stack tr{border-bottom:1px solid var(--line);padding:8px 0}table.stack td{border:0;padding:3px 0}table.stack td::before{content:attr(data-l);display:block;font-size:12.5px;color:var(--soft)}table.stack td:first-child{font-weight:700}table.stack td:first-child::before{display:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="band top">
+  <div class="top-in">
+    <div>
+      <h1>maimai 譜面類型指標企劃</h1>
+      <p class="meta">提案企劃書 · 2026 年 9 月 18 日 · Voi</p>
+      <p class="lead">遊戲中能區分譜面的，目前只有「等級」。本企劃參考 SDVX 的雷達圖，用一套客觀、可重現的標準，以五個指標描述 maimai 譜面的「類型」，幫助玩家選曲、初見、練習。</p>
+    </div>
+    <div class="radar">
+      <svg id="radar" viewBox="0 0 400 380" role="img" aria-label="五個指標的雷達圖示意"></svg>
+      <p>示意圖，非實際資料：虛線是同等級的平均（5 分）</p>
+    </div>
+  </div>
+</header>
+
+<div class="band">
+<div class="wrap">
+<nav class="toc" id="toc" aria-label="章節">
+  <a href="#purpose">一、目的及動機</a>
+  <a href="#concept">二、指標構想</a>
+  <a class="sub" href="#ref">2.1 參考資料及構想</a>
+  <a class="sub" href="#principles">2.2 設計原則</a>
+  <a class="sub" href="#sources">2.3 資料來源</a>
+  <a href="#indicators">三、設計指標提案</a>
+  <a class="sub" href="#speed">3.1 擊速</a>
+  <a class="sub" href="#burst">3.2 爆發</a>
+  <a class="sub" href="#move">3.3 位移</a>
+  <a class="sub" href="#slide">3.4 讀星</a>
+  <a class="sub" href="#swipe">3.5 刷鍵</a>
+  <a href="#method">四、指標計算方式構想</a>
+  <a class="sub" href="#score">4.1 指標分數計算方式</a>
+  <a class="sub" href="#data">4.2 資料記錄</a>
+  <a href="#refs">五、參考資料</a>
+</nav>
+
+<article>
+<section id="purpose">
+<h2>一、目的及動機</h2>
+<p>截至 maimai CiRCLE，maimai 國際版目前已經收錄超過 1300 首歌，而 12~14+ 的譜面更是突破 1800 張（表1）。面對如此龐大的數量，遊戲中能區分譜面的目前卻只有「等級」，讓同等級譜面之間，混雜了各種類型的譜面。在觀察下，注意到許多玩家為此困擾，不論是新手玩家選曲時不敢貿然選曲，希望練習特定類型譜面時卻苦無選曲方向。因此，我們希望提供等級以外的參考：用一套客觀、可重現的標準，描述 maimai 譜面的「類型」，幫助玩家選曲、初見、練習。</p>
+<div class="scroll">
+<table id="t1">
+  <thead><tr><th>等級</th><th class="num">譜面數</th></tr></thead>
+  <tbody></tbody>
+</table>
+</div>
+<p class="cap">表1. 國際版等級 12 到 14+ 的譜面數（截至 2026 年 10 月 CiRCLE 為止，STD 與 DX 合計，不含宴譜）</p>
+</section>
+
+<section id="concept">
+<h2>二、指標構想</h2>
+<h3 id="ref">2.1 參考資料及構想</h3>
+<p>在 SDVX 中，遊戲使用六個面向的雷達圖描述譜面，玩家看圖形就能直覺理解譜面類型。本提案參考這個做法，希望為 maimai 設計適合的指標。目前預計設計以下五個指標（詳見第三節）：</p>
+<ul>
+  <li><b>擊速</b>：譜面交互打擊最密集的段落，在單位時間內要敲打幾下。</li>
+  <li><b>爆發</b>：譜面密集的段落，是否集中在少數段落。</li>
+  <li><b>位移</b>：遊玩譜面時，雙手需要移動的距離。</li>
+  <li><b>讀星</b>：譜面中有多少需要判讀滑星的段落。</li>
+  <li><b>刷鍵</b>：譜面中有多少刷鍵的段落。</li>
+</ul>
+<h3 id="principles">2.2 設計原則</h3>
+<p>為盡量貼近設計目的，我們在指標的設計有以下五個原則：</p>
+<ol>
+  <li><b>只和同等級比較</b>。例如一張 13 的譜「擊速 7 分」（假設平均為 5 分），意思是它在所有 13 裡算快的，不代表它比 14 的譜快。</li>
+  <li><b>形狀代表類型</b>。雷達圖往哪個方向突出，就是這張譜的特色。分數高代表「這個特徵很明顯」，不見得代表「比較難」。</li>
+  <li><b>真實的差異照實呈現</b>。例如不同年代的譜面之間本來就有的風格差異，不刻意修正。</li>
+  <li><b>易讀性優先</b>。指標做得越詳盡時，規則就會越複雜，易讀性亦會跟著降低；因此我們承認指標有其極限，以求在指標的精確度與易讀性之間取得平衡。</li>
+  <li><b>公開透明</b>。所有定義與計算方式都會公開，同一份資料一定會算出同一個結果。</li>
+</ol>
+<h3 id="sources">2.3 資料來源</h3>
+<ul>
+  <li><b>譜面基本資料</b>（等級、版本、note 數量等）：取自網路上的公開整理資料。</li>
+  <li><b>每個 note 的詳細資料</b>：取自社群轉寫的 simai 譜面。而因為 simai 僅為寫譜用的記法，沒有直接寫出每個 note 在第幾秒，所以會先用一套<b>共用的轉換程式</b>把它轉成時間表，所有指標都從這份時間表計算，確保每個指標看到的是「同一張譜」。</li>
+</ul>
+</section>
+
+<section id="indicators">
+<h2>三、設計指標提案</h2>
+
+<h3 id="speed">3.1 擊速</h3>
+<p class="def">譜面交互打擊最密集的段落，在單位時間內要敲打幾下。</p>
+<p>例如一首歌大部分時候每秒按 4 下，但副歌有一段每秒要按 12 下，擊速看的就是那段 12 下。</p>
+<p>這個概念與玩家常說的「手速」概念相近，但一般玩家稱呼的手速，包含手臂運動的速度，例如滑星的滑動、刷鍵的速度；但這項指標只計算「擊打」的次數，為了避免混淆，我們另外取名為「擊速」，強調它衡量的是擊打的速度。</p>
+<p>計算方法：</p>
+<ul>
+  <li>both 算兩下。</li>
+  <li>滑星只計算星頭為一下，滑行動作不計入（滑星的部分亦另有讀星指標呈現）。</li>
+  <li>刷鍵每組只算一下，並算在刷進去的第一顆；雙手同時刷（例如雙轉圈）算兩下，和 both 一樣（刷鍵亦另有刷鍵指標呈現）。</li>
+  <li>複數 touch 若只需用一隻手掌蓋掉，亦只算一下。</li>
+</ul>
+<p>而「最密集的段落」該如何找出，將使用浮動窗口。</p>
+<h4>浮動窗口的設計</h4>
+<p>使用一個固定長度的時間範圍（窗口），從歌曲的每一個拍點出發各檢查一次，計算窗口內要擊打幾下，最後取最密集的段落（圖1）。而窗口的長度，為了避免太短只會抓到一小串連打，或太長又會使密集段落與其他段落平均拉低真實狀況，具體秒數的設計，會在測試後決定。</p>
+<figure>
+  <div class="fig-box scroll wide"><svg id="fig1" viewBox="0 0 760 210" role="img" aria-label="從每個拍點出發各檢查一次，取音符最密的一段"></svg></div>
+  <figcaption class="cap">圖1. 浮動窗口示意（每個框都是同樣長度的窗口，各從一顆音符出發，取音符最多的一段）</figcaption>
+</figure>
+
+<h3 id="burst">3.2 爆發</h3>
+<p class="def">譜面密集的段落，是否集中在少數段落。</p>
+<p>例如一張譜平常很輕鬆，最後突然來一段很密的「尾殺」，爆發就會很高；反過來說，如果整首歌從頭到尾都差不多密集，爆發就會很低。而如果有好幾個密集段落，例如兩次副歌都很激昂，爆發會介於兩者之間，越多則越接近「整首都密」（圖2、圖3）。</p>
+<p>計算方法：使用浮動窗口找出最密集的一段，再看密度是整首歌平均密度的幾倍。例如最密的一段每秒 12 個 note、整首歌平均每秒 6 個，爆發就是 2 倍。而因為平均包含了所有密集的段落，所以密集段落越多，平均越高，爆發也就越低，符合前段中對爆發指標設計的構想。</p>
+<figure>
+  <div class="burst" id="burstFigs"></div>
+  <figcaption class="cap">示意：120 秒的歌，平常每秒 2 個 note，每個高峰最高每秒 12 個。圖2 與圖3 的高峰一樣高；但高峰多的圖3，平均密度比較接近高峰，所以爆發比較低。</figcaption>
+</figure>
+<p>而我們希望可以透過擊速和爆發兩項指標的搭配，大致判斷譜面的類型（表2）。也希望未來可以透過組合更多不同的指標，辨認出不同種類的譜面。</p>
+<div class="scroll">
+<table>
+  <thead><tr><th class="nw">擊速</th><th class="nw">爆發</th><th>譜面類型</th></tr></thead>
+  <tbody>
+    <tr><td>高</td><td>高</td><td>最難的地方很密，而且集中在少數段落，例如尾殺</td></tr>
+    <tr><td>高</td><td>低</td><td>最難的地方很密，而且整首都差不多密，偏向體力型</td></tr>
+    <tr><td>低</td><td>高</td><td>不算快，但難度集中在少數段落；或困難段落並非要求擊速的譜面（例如以刷鍵、轉圈構成的困難段落）</td></tr>
+    <tr><td>低</td><td>低</td><td>整首都不快，也沒什麼起伏</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="cap">表2. 擊速與爆發的高低組合後所對應的譜面類型預想</p>
+<p>當然，我們也有意識到目前這樣的定義，會遇上一些指標或許應該標示，但目前無法反應的狀況。例如爆發指標在目前的定義下，看不出密集段落在歌曲的哪個位置，也看不出歌曲的長度。這些資訊未來可能會討論以其他方式補充。</p>
+
+<h3 id="move">3.3 位移</h3>
+<p class="def">遊玩譜面時，雙手大概要移動多少距離。</p>
+<p>與常見下落式定點音樂遊戲不同，maimai 的按鍵分布在一個相對較大的圓形盤面上，因此在遊玩過程中，譜面是否消耗體力取決於手臂在盤面上大範圍地來回移動的距離。例如相同的 note 數量，譜面的 note 若集中在相鄰的按鍵，手臂幾乎不用移動；相對於分散於不同按鍵，需要手臂來回移動的譜面，體力的消耗及負擔皆會大幅增加。因此我們預計以位移指標來反映譜面的<b>體力消耗</b>。</p>
+<p>為了取得相關資料，我們開發了動作模擬工具 <a href="https://github.com/silver0416/MaiMotionDemo">MaiMotionDemo</a>，模擬玩家雙手的自然動作，了解遊玩譜面時「哪隻手按了哪個 note」且「會經過哪些地方」，藉此取得相關資料。</p>
+<h4>MaiMotionDemo</h4>
+<p>在計算各項指標前，我們首先需要回答「遊玩一張譜面時，哪一隻手，在什麼時候，移動到哪裡」等問題，並使用此工具轉寫 simai 譜面成事件表。然而上千張的譜面，我們不可能以人工標註所有譜面，因此需要一個工具，來推算出譜面中接近一般玩家的自然打法。</p>
+<p>工具在讀入譜面後，會把盤面當成一個座標平面，外圈的 8 個按鍵與各個 touch 區都有固定的位置，滑星則依形狀畫出路徑。接著，它會在可能的雙手分配中搜尋，替每一種方案計算「成本」，例如移動的距離與速度，左右手是否交叉，同一隻手是否負擔過重。最後選出成本最低，希望也是自然的打法。</p>
+<p>為了讓模擬的打法接近真實的玩家，工具不以人為設定的規則決定手順，而是分成三步驟推算：</p>
+<ol>
+  <li><b>人工標記</b>：先挑選一部分譜面，由真實玩家將實際的手順標記下來，也就是每一個 note 用哪一隻手處理。</li>
+  <li><b>機器學習</b>：用這些標記調整第一層各項成本的比重，讓工具學習一般玩家的習慣，例如什麼情況下會左右交替、什麼情況下會用同一隻手、什麼情況下會避免交叉手；第二層的 TemotoAI 則是從玩家的手元影片學習打法。</li>
+  <li><b>驗證</b>：用學到的規則去推算沒有標記過的譜面，再拿一部分人工標記的結果來比對，確認推算得準不準。</li>
+</ol>
+<p>以 v1.2.2（2026 年 11 月）來說，以目前已標記的譜面比對，第一層 V4.1 推算的手順與人工標記約 95% 一致，加上第二層 TemotoAI-2 後約 96%；不過這些譜面大多也參與了模型的訓練，使得數據可能偏高，也不夠穩定，資料集的擴充以及未參與訓練的譜面驗證仍待進行。</p>
+<p class="plan">為此，我們計畫依譜面風格的變化把版本分成幾個時期，按各時期、各等級的譜面數量比例分批抽選，確保資料集不會受到偏倚。標記的方式，可直接透過工具紀錄，亦希望有更多玩家參與協助。</p>
+
+<h3 id="slide">3.4 讀星</h3>
+<p class="def">這首歌有多少時間，需要判斷先滑哪一條滑星。</p>
+<p>滑星是 maimai 最大的特色，但滑星多不代表難，滑星少也不代表簡單。我們認為滑星真正困難的地方，在於<b>畫面上同時有好幾條滑星時，要判斷先滑哪一條</b>。因此這個指標看的是：好幾條滑星同時在進行的時間，佔整首歌的比例。</p>
+<p>計算原則：</p>
+<ul>
+  <li>同時按下星頭的滑星算作一組。例如雙滑、wifi 滑星，從同一顆星分岔出去的滑星等，以上都只算作一組，因為它們不需要判斷先後。</li>
+  <li>每組滑星從<b>按下星頭的那一刻</b>開始計算，到滑完為止。星星按下後、還沒開始滑的等待時間也算在內，因為這段時間玩家已經要注意它。</li>
+  <li>只有兩組以上的滑星同時在進行時，才計入時間。例如一連串很快的星星，前一條還沒滑完、下一顆星就已經按下，這段時間就會計入。</li>
+</ul>
+<p>而在這樣的計算原則下，可以預見在滑星多數只有一條的譜面中，此項指標得分可能會很低，甚至接近 0。但這不代表譜面沒有滑星，只代表很少需要判斷先滑哪一條；為了避免誤會，數值很低時要如何標示（例如設定顯示的下限，或另外註明），會在看過實際資料後另外調整。</p>
+
+<h3 id="swipe">3.5 刷鍵</h3>
+<p class="def">這首歌有多少時間在刷鍵。</p>
+<p>刷鍵的顆數因為會受到歌曲 BPM 及拍號影響，只數刷鍵的顆數並不準確，刷鍵的顆數無法反映刷鍵在一張譜面中的正確比例，因此我們決定直接計算刷鍵時間佔整首歌的比例。若有雙手同時轉圈的情形，兩隻手的時間會分別計算再加總。</p>
+</section>
+
+<section id="method">
+<h2>四、指標計算方式構想</h2>
+<h3 id="score">4.1 指標分數計算方式</h3>
+<p>將各譜面對應到各項指標的數據計算出來後，經由數據處理（例如標準化），以淺顯易懂的方式（例如 0 到 10 分）呈現。</p>
+<p>我們會以<b>舊譜面</b>建立比較基準。比照遊戲計算 Rating 時的新曲規則，最新兩個版本的譜面稱為新譜面，其餘的稱為舊譜面。新譜面追加時，僅與舊譜面建立的基準比較，舊譜面的分數不會因此改變，只有在遊戲大改版，新譜面轉為舊譜面時，才會進行重新計算。</p>
+<figure>
+  <div class="fig-box scroll flow"><svg id="fig4" viewBox="0 0 520 842" role="img" aria-label="指標建立流程：從譜面資料到雷達圖，新譜面套用舊譜面建立的基準"></svg></div>
+  <figcaption class="cap">圖4. 指標建立流程</figcaption>
+</figure>
+<h3 id="data">4.2 資料記錄</h3>
+<p>所有資料會整理成一個資料庫，主要包含：歌曲與譜面的基本資料，轉換後的 note 時間表、MaiMotionDemo 的結果，以及每項指標的分數。當遊戲調整等級或追加新曲時，只要更新資料，分數就能自動重新計算。</p>
+<p>資料庫預計分成四層，由上往下依序計算：</p>
+<div class="scroll">
+<table class="stack">
+  <thead><tr><th class="nw">層</th><th>內容</th><th>更新時間</th></tr></thead>
+  <tbody>
+    <tr><td class="nw">i. 基本資料</td><td>歌曲與譜面的基本資訊。歌曲包括曲名、BPM 等；譜面包括所屬歌曲、STD 或 DX、難度、等級、收錄版本與 simai 譜面原文</td><td>追加新曲、調整等級時</td></tr>
+    <tr><td class="nw">ii. 譜面內容</td><td>note 時間表（每個 note 在第幾秒、是什麼種類、在哪個位置），以及 MaiMotionDemo 的結果（每個 note 由哪隻手處理、實際按了幾下、哪些是刷鍵、雙手移動的軌跡）</td><td>新增譜面，或轉換程式、MaiMotionDemo 更新時</td></tr>
+    <tr><td class="nw">iii. 指標數據</td><td>每張譜面在各項指標上算出來的數值</td><td>第 ii 層更新，或指標的計算方式調整時</td></tr>
+    <tr><td class="nw">iv. 分數</td><td>和同等級譜面比較後的分數，以及各等級的比較基準</td><td>等級調整、遊戲大改版時</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section id="refs">
+<h2>五、參考資料</h2>
+<ul class="refs">
+  <li><a href="https://arcade-songs.zetaraku.dev/maimai/">arcade-songs</a>，2026 年 10 月 30 日更新，11 月 10 日取得。</li>
+  <li><a href="https://github.com/silver0416/MaiMotionDemo">MaiMotionDemo</a>：參考 v1.2.0（2026 年 11 月 9 日）的使用手冊、原始碼、提交紀錄，2026 年 11 月 10 日查閱。</li>
+</ul>
+</section>
+</article>
+</div>
+</div>
+
+<footer class="band"><p>最後更新：2026 年 11 月 27 日</p></footer>
+
+<script>
+{
+const NS = 'http://www.w3.org/2000/svg';
+
+/* 表1 */
+const levels = [['12', 231], ['12+', 380], ['13', 513], ['13+', 401], ['14', 222], ['14+', 85]];
+const total = levels.reduce((a, r) => a + r[1], 0);
+document.querySelector('#t1 tbody').innerHTML =
+  levels.map(r => `<tr><td>${r[0]}</td><td class="num">${r[1].toLocaleString()}</td></tr>`).join('') +
+  `<tr class="total"><td>合計</td><td class="num">${total.toLocaleString()}</td></tr>`;
+
+/* 雷達圖（示意值） */
+const axes = [['擊速', 7], ['爆發', 4], ['位移', 6.5], ['讀星', 3], ['刷鍵', 5.5]];
+const cx = 200, cy = 196, R = 132;
+const pt = (i, v) => {
+  const a = -Math.PI / 2 + i * 2 * Math.PI / axes.length;
+  return [cx + Math.cos(a) * R * v / 10, cy + Math.sin(a) * R * v / 10];
+};
+const poly = v => axes.map((_, i) => pt(i, typeof v === 'function' ? v(i) : v).map(n => n.toFixed(1)).join(',')).join(' ');
+let r = '';
+[2, 4, 6, 8, 10].forEach(v => { r += `<polygon class="r-grid" points="${poly(v)}"/>`; });
+axes.forEach((_, i) => { const [x, y] = pt(i, 10); r += `<line class="r-grid" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`; });
+r += `<polygon class="r-avg" points="${poly(5)}"/>`;
+r += `<polygon class="r-shape" points="${poly(i => axes[i][1])}"/>`;
+axes.forEach((a, i) => { const [x, y] = pt(i, a[1]); r += `<circle class="r-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5"/>`; });
+axes.forEach((a, i) => {
+  const [x, y] = pt(i, 11.6);
+  const anchor = Math.abs(x - cx) < 8 ? 'middle' : (x > cx ? 'start' : 'end');
+  r += `<text class="r-lab" x="${x.toFixed(1)}" y="${(y + 6).toFixed(1)}" text-anchor="${anchor}">${a[0]}</text>`;
+});
+document.getElementById('radar').innerHTML = r;
+
+/* 圖1 浮動窗口 */
+const notes = [170, 210, 250, 290, 330, 360, 376, 392, 408, 424, 440, 456, 472, 488, 504, 520, 560, 568, 576, 620, 660, 700];
+const yN = 60;
+const wins = [[170, 330, 100, false], [250, 410, 124, false], [360, 520, 148, true], [560, 720, 172, false]];
+let f1 = `<line class="f-line" x1="150" x2="720" y1="${yN}" y2="${yN}"/>`;
+f1 += notes.map(x => `<circle class="f-ink" cx="${x}" cy="${yN}" r="4"/>`).join('');
+f1 += `<text class="f-ink" x="24" y="${yN + 5}" font-size="14">音符</text><text class="f-soft" x="720" y="${yN - 14}" text-anchor="end" font-size="12">時間 →</text>`;
+f1 += wins.map(w => `<line class="f-line" stroke-dasharray="3 3" x1="${w[0]}" x2="${w[0]}" y1="${yN + 6}" y2="${w[2] - 9}"/><rect class="${w[3] ? 'f-main' : 'f-box'}" x="${w[0]}" y="${w[2] - 9}" width="${w[1] - w[0]}" height="18" rx="4"/>`).join('');
+f1 += `<text class="f-ink" x="24" y="132" font-size="14">窗口（固定長度）</text><text class="f-soft" x="24" y="152" font-size="12">從每一顆音符出發</text><text class="f-ink" x="530" y="153" font-size="14" font-weight="700">最密的一段</text>`;
+document.getElementById('fig1').innerHTML = f1;
+
+/* 圖2、圖3 爆發 */
+const songs = [
+  { fig: '圖2. 只有一個高峰的譜面（爆發高）', peaks: [60] },
+  { fig: '圖3. 有兩個高峰的譜面（爆發低）', peaks: [35, 85] }
+];
+const base = 2, height = 10, sigma = 12, len = 120;
+const dens = (s, t) => base + s.peaks.reduce((a, c) => a + height * Math.exp(-((t - c) ** 2) / (2 * sigma * sigma)), 0);
+const ts = Array.from({ length: len * 2 + 1 }, (_, k) => k / 2);
+const stats = songs.map(s => {
+  const d = ts.map(t => dens(s, t));
+  return { avg: d.reduce((a, v) => a + v, 0) / d.length, peak: Math.max(...d) };
+});
+const W = 360, H = 300, L = 46, Rm = 78, T = 54, B = 236, dmax = 14;
+const X = t => L + t / len * (W - L - Rm), Y = v => B - v / dmax * (B - T);
+document.getElementById('burstFigs').innerHTML = songs.map((s, i) => {
+  const { avg, peak } = stats[i];
+  const path = ts.map((t, k) => `${k ? 'L' : 'M'}${X(t).toFixed(1)} ${Y(dens(s, t)).toFixed(1)}`).join('');
+  let g = `<text class="b-k" x="${W / 2}" y="24" text-anchor="middle">${s.fig}</text>`;
+  g += `<text class="b-t" x="${W / 2}" y="42" text-anchor="middle">爆發 = ${peak.toFixed(1)} ÷ ${avg.toFixed(1)} = ${(peak / avg).toFixed(1)} 倍</text>`;
+  [0, 4, 8, 12].forEach(v => { g += `<line class="b-axis" x1="${L}" x2="${W - Rm}" y1="${Y(v)}" y2="${Y(v)}"/><text class="b-t" x="${L - 8}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`; });
+  [0, 30, 60, 90, 120].forEach(t => { g += `<text class="b-t" x="${X(t)}" y="${B + 18}" text-anchor="middle">${t}</text>`; });
+  g += `<text class="b-t" x="${(L + W - Rm) / 2}" y="${B + 38}" text-anchor="middle">時間（秒）</text>`;
+  g += `<text class="b-t" transform="translate(14 ${(T + B) / 2}) rotate(-90)" text-anchor="middle">每秒 note 數</text>`;
+  g += `<rect class="b-avgwash" x="${L}" y="${Y(avg)}" width="${W - L - Rm}" height="${B - Y(avg)}"/>`;
+  g += `<path class="b-area" d="${path}L${X(len)} ${B}L${X(0)} ${B}Z"/><path class="b-line" d="${path}"/>`;
+  g += `<line class="b-peak" x1="${L}" x2="${W - Rm}" y1="${Y(peak)}" y2="${Y(peak)}"/><text class="b-t" x="${W - Rm + 6}" y="${Y(peak) + 4}">高峰 ${peak.toFixed(1)}</text>`;
+  g += `<line class="b-avg" x1="${L}" x2="${W - Rm}" y1="${Y(avg)}" y2="${Y(avg)}"/><text class="b-k" x="${W - Rm + 6}" y="${Y(avg) + 4}">平均 ${avg.toFixed(1)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${s.fig}">${g}</svg>`;
+}).join('');
+
+/* 圖4 流程 */
+const box = (cx, cy, w, h, label, sub, main) => {
+  let s = `<rect class="${main ? 'f-main' : 'f-box'}" x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" rx="8"/>`;
+  if (sub) s += `<text class="f-ink" x="${cx}" y="${cy - 4}" text-anchor="middle" font-size="14" font-weight="700">${label}</text><text class="f-soft" x="${cx}" y="${cy + 16}" text-anchor="middle" font-size="12">${sub}</text>`;
+  else s += `<text class="f-ink" x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="14"${main ? ' font-weight="700"' : ''}>${label}</text>`;
+  return s;
+};
+const arrows = ['M150 52V70H245V86', 'M370 52V70H275V86', 'M260 132V176', 'M260 222V266', 'M260 332V376', 'M260 422V458',
+  'M160 498H120V596', 'M360 498H400V602', 'M120 656V718H168', 'M400 650V718H352', 'M260 740V784'];
+let f4 = `<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="f-arrow" d="M0 0L10 5L0 10z"/></marker></defs>`;
+f4 += arrows.map(d => `<path class="f-line" d="${d}" marker-end="url(#ar)"/>`).join('');
+f4 += `<path class="f-line" stroke-dasharray="4 4" d="M225 628H298" marker-end="url(#ar)"/>`;
+f4 += box(150, 30, 170, 44, '譜面基本資料') + box(370, 30, 170, 44, 'simai 原文') + box(260, 110, 180, 44, '譜面資料表');
+f4 += `<text class="f-soft" x="272" y="158" font-size="12">MaiMotionDemo 解析</text>`;
+f4 += box(260, 200, 180, 44, 'note 事件表') + box(260, 300, 300, 64, '事件表分析', '手部分配、按壓次數、刷鍵判定、移動軌跡等') + box(260, 400, 180, 44, '各指標原始值');
+f4 += `<polygon class="f-box" points="160,498 260,460 360,498 260,536"/><text class="f-ink" x="260" y="503" text-anchor="middle" font-size="13.5">舊譜面或新譜面？</text>`;
+f4 += `<text class="f-soft" x="140" y="488" text-anchor="middle" font-size="12">舊譜面</text><text class="f-soft" x="380" y="488" text-anchor="middle" font-size="12">新譜面</text>`;
+f4 += box(120, 628, 210, 56, '同等級舊譜面建立基準', '排除 ±3σ 一次') + box(400, 628, 196, 44, '套用舊譜面的基準', '', true);
+f4 += `<text class="f-soft" x="262" y="618" text-anchor="middle" font-size="12">提供基準</text>`;
+f4 += box(260, 718, 180, 44, '相對分數') + box(260, 808, 180, 44, '雷達圖');
+document.getElementById('fig4').innerHTML = f4;
+
+/* 目前章節 */
+const links = [...document.querySelectorAll('#toc a')];
+const targets = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+const mark = () => {
+  let cur = targets[0];
+  for (const t of targets) if (t.getBoundingClientRect().top < 120) cur = t;
+  links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + cur.id));
+};
+window.addEventListener('scroll', mark, { passive: true });
+mark();
+
+/* 手機版表格的欄名 */
+document.querySelectorAll('table.stack').forEach(tb => {
+  const heads = [...tb.querySelectorAll('thead th')].map(th => th.textContent);
+  tb.querySelectorAll('tbody tr').forEach(tr => [...tr.cells].forEach((c, i) => { c.dataset.l = heads[i] || ''; }));
+});
+}
+</script>
+</body>
+</html>
